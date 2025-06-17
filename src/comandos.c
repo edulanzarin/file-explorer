@@ -13,16 +13,6 @@
 #include <linux/magic.h>  // Números mágicos de sistemas de arquivos
 #include <linux/fiemap.h> // Para mapeamento de extents
 
-/* Flag que indica quando um arquivo está "inline" no sistema de arquivos
-   (ou seja, os dados estão guardados direto no inode, sem usar blocos separados)
-   Usado quando verificamos como o arquivo está armazenado fisicamente */
-#define FIEMAP_EXTENT_INLINE 0x00000080
-
-/* Número máximo de pedaços (extents) que vamos verificar quando analisamos
-   como um arquivo está fragmentado no disco. Se tiver mais que isso, ignoramos
-   o resto - é só pra evitar usar memória demais com arquivos muito fragmentados */
-#define MAX_EXTENTS 512
-
 /* Mostra detalhes estruturais do arquivo
    - Número do inode, links, tamanho em bytes/blocos
    - Informações sobre o dispositivo onde está armazenado
@@ -44,30 +34,6 @@ static void mostrar_detalhes_estruturais(const char *caminho)
     printf("Tamanho do bloco: %ld bytes\n", file_stat.st_blksize);
     printf("Dispositivo: %u,%u (major/minor)\n",
            major(file_stat.st_dev), minor(file_stat.st_dev));
-}
-
-/* Verifica se o sistema de arquivos é compatível
-   com as operações que vamos realizar
-   Suporta EXT4, XFS e BTRFS
-*/
-static int verificar_fs_compativel(const char *caminho)
-{
-    struct statfs fs_info;
-    if (statfs(caminho, &fs_info) != 0)
-    {
-        return 0;
-    }
-
-    // Tipos de sistemas de arquivos suportados
-    switch (fs_info.f_type)
-    {
-    case 0xEF53:     // EXT4
-    case 0x58465342: // XFS
-    case 0x9123683E: // BTRFS
-        return 1;
-    default:
-        return 0;
-    }
 }
 
 /* Mostra como o arquivo está armazenado fisicamente no disco

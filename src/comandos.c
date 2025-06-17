@@ -1,17 +1,4 @@
 #include "comandos.h"
-#include <fcntl.h>
-#include <linux/fiemap.h> // Para mapeamento de extents
-#include <linux/fs.h>     // Para FIBMAP (mapeamento de blocos)
-#include <linux/magic.h>  // Números mágicos de sistemas de arquivos
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/ioctl.h>
-#include <sys/stat.h>
-#include <sys/sysmacros.h>
-#include <sys/vfs.h>
-#include <time.h>
-#include <unistd.h>
 
 /* Mostra detalhes estruturais do arquivo
    - Número do inode, links, tamanho em bytes/blocos

@@ -1,10 +1,4 @@
 #include "navegacao.h"
-#include <dirent.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/stat.h>
-#include <unistd.h>
 
 /* verifica se é uma pasta */
 int eh_diretorio(const char *caminho) {

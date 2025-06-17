@@ -1,6 +1,14 @@
 #ifndef NAVEGACAO_H
 #define NAVEGACAO_H
 
+#include <dirent.h>
+#include <stddef.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
 /* tamanho máximo que um caminho de arquivo pode ter */
 #define MAX_PATH_LEN 1024
 

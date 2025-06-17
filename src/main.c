@@ -8,26 +8,26 @@
 
 int main() {
   // Variáveis principais
-  char diretorio_atual[MAX_PATH_LEN]; // Guarda onde estamos
-  DirEntry *entries = NULL;           // Lista de arquivos/pastas
-  int num_entradas = 0;               // Quantos itens tem na lista
-  int selecionado = 0;                // Item selecionado na tela
-  int sair = 0;                       // Flag pra saber quando fechar
+  char dir_atual[MAX_PATH_LEN]; // Guarda onde estamos
+  DirEntry *entries = NULL;     // Lista de arquivos/pastas
+  int num_entradas = 0;         // Quantos itens tem na lista
+  int selecionado = 0;          // Item selecionado na tela
+  int sair = 0;                 // Flag pra saber quando fechar
 
   // Prepara o terminal pra ler teclas direto
   configurar_terminal();
 
   // Começa no diretório atual do programa
-  obter_diretorio_atual(diretorio_atual, sizeof(diretorio_atual));
+  obter_dir_atual(dir_atual, sizeof(dir_atual));
 
   // Pega a lista de coisas que tem nesse diretório
-  num_entradas = listar_diretorio(diretorio_atual, &entries);
+  num_entradas = listar_diretorio(dir_atual, &entries);
 
   // Loop principal - roda até o usuário pedir pra sair
   while (!sair) {
     // Limpa a tela e mostra tudo de novo
     limpar_tela();
-    exibir_cabecalho(diretorio_atual);                   // Título e caminho
+    exibir_cabecalho(dir_atual);                         // Título e caminho
     exibir_entradas(entries, num_entradas, selecionado); // Lista de arquivos
     atualizar_rodape_comandos();                         // Ajuda dos comandos
 
@@ -54,13 +54,13 @@ int main() {
       if (num_entradas > 0) {
         char caminho_selecionado[MAX_PATH_LEN];
         snprintf(caminho_selecionado, sizeof(caminho_selecionado), "%s/%s",
-                 diretorio_atual, entries[selecionado].nome);
+                 dir_atual, entries[selecionado].nome);
 
         // Só entra se for mesmo uma pasta
         if (eh_diretorio(caminho_selecionado)) {
           // Verifica se o caminho não é muito grande
-          size_t needed = snprintf(NULL, 0, "%s/%s", diretorio_atual,
-                                   entries[selecionado].nome);
+          size_t needed =
+              snprintf(NULL, 0, "%s/%s", dir_atual, entries[selecionado].nome);
           if (needed >= MAX_PATH_LEN) {
             printf("\nErro: Caminho muito longo (max %d caracteres)\n",
                    MAX_PATH_LEN - 1);
@@ -68,11 +68,11 @@ int main() {
           }
 
           // Atualiza pra nova pasta
-          strncpy(diretorio_atual, caminho_selecionado, MAX_PATH_LEN);
+          strncpy(dir_atual, caminho_selecionado, MAX_PATH_LEN);
 
           // Pega os arquivos da nova pasta
           DirEntry *novas_entradas = NULL;
-          int novo_num = listar_diretorio(diretorio_atual, &novas_entradas);
+          int novo_num = listar_diretorio(dir_atual, &novas_entradas);
 
           if (novo_num >= 0) // Se deu certo
           {
@@ -93,16 +93,16 @@ int main() {
 
     case 'i': // Mostra info do arquivo selecionado
       if (num_entradas > 0) {
-        mostrar_info_arquivo(diretorio_atual, entries[selecionado].nome);
+        mostrar_info_arquivo(dir_atual, entries[selecionado].nome);
       }
       break;
 
     case 'f': // Cria arquivo fragmentado (pra teste)
       if (num_entradas > 0) {
-        criar_arquivo_fragmentado(diretorio_atual);
+        criar_arquivo_fragmentado(dir_atual);
         // Atualiza a lista de arquivos
         DirEntry *novas_entradas = NULL;
-        int novo_num = listar_diretorio(diretorio_atual, &novas_entradas);
+        int novo_num = listar_diretorio(dir_atual, &novas_entradas);
         if (novo_num >= 0) {
           free(entries);
           entries = novas_entradas;
@@ -113,8 +113,8 @@ int main() {
       }
       break;
 
-    case 'q':                                 // Sai do programa
-      limpar_arquivos_teste(diretorio_atual); // Limpa lixo de teste
+    case 'q':                           // Sai do programa
+      limpar_arquivos_teste(dir_atual); // Limpa lixo de teste
       sair = 1;
       break;
     }

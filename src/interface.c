@@ -9,10 +9,10 @@ void limpar_tela() {
 }
 
 /* Mostra o cabeçalho bonitinho */
-void exibir_cabecalho(const char *diretorio_atual) {
+void exibir_cabecalho(const char *dir_atual) {
   printf("\033[1m"); // Liga o negrito
   printf("=== Explorador de Arquivos ===\n");
-  printf("Diretório: %s\n", diretorio_atual);
+  printf("Diretório: %s\n", dir_atual);
   printf("\033[0m"); // Desliga formatação
 }
 

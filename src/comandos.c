@@ -144,11 +144,10 @@ static void mostrar_detalhes_especiais(const char *caminho) {
 /* Função principal que mostra todas as informações do arquivo
    Combina todos os detalhes em uma saída formatada
 */
-void mostrar_info_arquivo(const char *diretorio_atual,
-                          const char *nome_arquivo) {
+void mostrar_info_arquivo(const char *dir_atual, const char *nome_arquivo) {
   char caminho[1024];
-  if (snprintf(caminho, sizeof(caminho), "%s/%s", diretorio_atual,
-               nome_arquivo) >= (int)sizeof(caminho)) {
+  if (snprintf(caminho, sizeof(caminho), "%s/%s", dir_atual, nome_arquivo) >=
+      (int)sizeof(caminho)) {
     printf("\nCaminho muito longo!\n");
     return;
   }
@@ -184,16 +183,16 @@ void mostrar_info_arquivo(const char *diretorio_atual,
    - Remove alguns para criar "buracos"
    - Cria um arquivo grande que ficará fragmentado
 */
-void criar_arquivo_fragmentado(const char *diretorio_atual) {
+void criar_arquivo_fragmentado(const char *dir_atual) {
   char caminho[1024];
-  snprintf(caminho, sizeof(caminho), "%s/arquivo_fragmentado", diretorio_atual);
+  snprintf(caminho, sizeof(caminho), "%s/arquivo_fragmentado", dir_atual);
 
   printf("\nCriando arquivo fragmentado em: %s\n", caminho);
 
   // Cria arquivos temporários para forçar fragmentação
   char temp1[1024], temp2[1024];
-  snprintf(temp1, sizeof(temp1), "%s/temp1", diretorio_atual);
-  snprintf(temp2, sizeof(temp2), "%s/temp2", diretorio_atual);
+  snprintf(temp1, sizeof(temp1), "%s/temp1", dir_atual);
+  snprintf(temp2, sizeof(temp2), "%s/temp2", dir_atual);
 
   printf("Criando arquivos temporários para forçar fragmentação...\n");
   system("dd if=/dev/zero of=temp1 bs=1M count=50 status=none");
@@ -217,9 +216,9 @@ void criar_arquivo_fragmentado(const char *diretorio_atual) {
 /* Limpa os arquivos criados para testes
    Remove o arquivo fragmentado criado anteriormente
 */
-void limpar_arquivos_teste(const char *diretorio_atual) {
+void limpar_arquivos_teste(const char *dir_atual) {
   char caminho[1024];
-  snprintf(caminho, sizeof(caminho), "%s/arquivo_fragmentado", diretorio_atual);
+  snprintf(caminho, sizeof(caminho), "%s/arquivo_fragmentado", dir_atual);
   remove(caminho);
   printf("Arquivo fragmentado removido: %s\n", caminho);
 }

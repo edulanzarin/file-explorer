@@ -78,6 +78,6 @@ int listar_diretorio(const char *caminho, DirEntry **entries) {
 }
 
 /* Pega a pasta atual onde estamos */
-void obter_diretorio_atual(char *buffer, size_t tamanho) {
+void obter_dir_atual(char *buffer, size_t tamanho) {
   getcwd(buffer, tamanho); // Função do sistema que faz isso
 }

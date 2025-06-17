@@ -19,6 +19,6 @@ typedef struct {
 /* funções de navegação implementadas em navegacao.c */
 int listar_diretorio(const char *caminho, DirEntry **entries);
 int eh_diretorio(const char *caminho);
-void obter_diretorio_atual(char *buffer, size_t tamanho);
+void obter_dir_atual(char *buffer, size_t tamanho);
 
 #endif

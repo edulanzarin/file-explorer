@@ -31,7 +31,7 @@ int main()
         limpar_tela();
         exibir_cabecalho(diretorio_atual);                   // Título e caminho
         exibir_entradas(entries, num_entradas, selecionado); // Lista de arquivos
-        exibir_rodape();                                     // Ajuda dos comandos
+        atualizar_rodape_comandos();                         // Ajuda dos comandos
 
         // Espera o usuário apertar alguma tecla
         char c = getchar();

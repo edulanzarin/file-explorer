@@ -1,31 +1,23 @@
 #ifndef INTERFACE_H
 #define INTERFACE_H
 
+/* includes necessários que são usados em interface.c */
+#include <stdio.h>
+#include <stdlib.h>
+#include <termios.h>
+#include <unistd.h>
+#include <string.h>
+
+/* navegacao.h importado para utilizar a estrutura DirEntry na função
+ * exibir_entradas() para mostrar os arquivos/diretórios na interface
+ */
 #include "navegacao.h"
 
-/* Limpa a tela do terminal */
+/* Funções de interface implementadas em interface.c */
 void limpar_tela();
-
-/* Mostra o título e o diretório atual no topo */
 void exibir_cabecalho(const char *diretorio_atual);
-
-/* Mostra a lista de arquivos e pastas
-   - entries: lista de itens do diretório
-   - num_entradas: quantos itens tem
-   - selecionado: qual item tá marcado (em destaque)
-*/
 void exibir_entradas(DirEntry *entries, int num_entradas, int selecionado);
-
-/* Mostra a barra de comandos embaixo */
-void exibir_rodape();
-
-/* Liga o modo "raw" do terminal:
-   - Teclas são lidas na hora (sem esperar Enter)
-   - Não mostra o que digitamos
-*/
 void configurar_terminal();
-
-/* Volta o terminal ao normal quando o programa fecha */
 void restaurar_terminal();
 
-#endif // INTERFACE_H
+#endif

@@ -11,8 +11,8 @@
 /* Cada entrada pode ser um arquivo ou pasta */
 typedef struct
 {
-    char nome[MAX_PATH_LEN]; // Nome do arquivo/pasta
-    int is_dir;              // 1 = pasta, 0 = arquivo
+   char nome[MAX_PATH_LEN]; /* array de caracteres para o nome */
+   int is_dir;              /* indica se é diretório (1) ou arquivo (0) */
 } DirEntry;
 
 /* Lista tudo que tem dentro de uma pasta

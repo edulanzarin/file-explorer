@@ -1,10 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <termios.h>
-#include <unistd.h>
-#include <string.h>
 #include "interface.h"
-#include "comandos.h"
 
 /* Guarda como o terminal estava antes de mexermos */
 static struct termios oldt;
@@ -54,12 +48,6 @@ void exibir_entradas(DirEntry *entries, int num_entradas, int selecionado)
 
         printf("\033[0m\n"); // Volta ao normal
     }
-}
-
-/* Mostra os comandos disponíveis embaixo */
-void exibir_rodape()
-{
-    atualizar_rodape_comandos(); // Pega a mensagem pronta
 }
 
 /* Configura o terminal pra ler teclas direto

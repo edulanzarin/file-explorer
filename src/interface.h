@@ -4,9 +4,9 @@
 /* includes necessários que são usados em interface.c */
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <termios.h>
 #include <unistd.h>
-#include <string.h>
 
 /* navegacao.h importado para utilizar a estrutura DirEntry na função
  * exibir_entradas() para mostrar os arquivos/diretórios na interface

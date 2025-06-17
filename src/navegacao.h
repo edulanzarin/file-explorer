@@ -11,10 +11,9 @@
 /* estrutura para representar a entrada de um diretório, um arquivo
  * ou pasta listado dentro de uma pasta
  */
-typedef struct
-{
-   char nome[MAX_PATH_LEN]; /* array de caracteres para o nome */
-   int is_dir;              /* indica se é diretório (1) ou arquivo (0) */
+typedef struct {
+  char nome[MAX_PATH_LEN]; /* array de caracteres para o nome */
+  int is_dir;              /* indica se é diretório (1) ou arquivo (0) */
 } DirEntry;
 
 /* funções de navegação implementadas em navegacao.c */

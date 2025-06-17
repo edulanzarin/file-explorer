@@ -1,22 +1,25 @@
 #include "comandos.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <unistd.h> // Adicionado para readlink()
+#include <unistd.h>
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/vfs.h>
-#include <sys/ioctl.h>     // Para ioctl()
-#include <sys/sysmacros.h> // Para major() e minor()
-#include <linux/fs.h>      // Para FIBMAP
-#include <linux/magic.h>   // Para os defines de magic numbers (opcional)
-#include <linux/fiemap.h>
+#include <sys/ioctl.h>
+#include <sys/sysmacros.h>
+#include <linux/fs.h>     // Para FIBMAP (mapeamento de blocos)
+#include <linux/magic.h>  // Números mágicos de sistemas de arquivos
+#include <linux/fiemap.h> // Para mapeamento de extents
 
 #define FIEMAP_EXTENT_INLINE 0x00000080
 #define MAX_EXTENTS 512
 
+/* Mostra detalhes estruturais do arquivo
+   - Número do inode, links, tamanho em bytes/blocos
+   - Informações sobre o dispositivo onde está armazenado
+*/
 static void mostrar_detalhes_estruturais(const char *caminho)
 {
     struct stat file_stat;
@@ -32,10 +35,14 @@ static void mostrar_detalhes_estruturais(const char *caminho)
     printf("Tamanho: %ld bytes\n", file_stat.st_size);
     printf("Blocos alocados: %ld (blocos de 512 bytes)\n", file_stat.st_blocks);
     printf("Tamanho do bloco: %ld bytes\n", file_stat.st_blksize);
-    printf("Dispositivo: %u,%u (major/minor)\n", // Alterado para %u
+    printf("Dispositivo: %u,%u (major/minor)\n",
            major(file_stat.st_dev), minor(file_stat.st_dev));
 }
 
+/* Verifica se o sistema de arquivos é compatível
+   com as operações que vamos realizar
+   Suporta EXT4, XFS e BTRFS
+*/
 static int verificar_fs_compativel(const char *caminho)
 {
     struct statfs fs_info;
@@ -44,18 +51,23 @@ static int verificar_fs_compativel(const char *caminho)
         return 0;
     }
 
-    // Magic numbers dos sistemas de arquivos suportados
+    // Tipos de sistemas de arquivos suportados
     switch (fs_info.f_type)
     {
-    case 0xEF53:     // EXT4_SUPER_MAGIC
-    case 0x58465342: // XFS_SUPER_MAGIC
-    case 0x9123683E: // BTRFS_SUPER_MAGIC
+    case 0xEF53:     // EXT4
+    case 0x58465342: // XFS
+    case 0x9123683E: // BTRFS
         return 1;
     default:
         return 0;
     }
 }
 
+/* Mostra como o arquivo está armazenado fisicamente no disco
+   - Lista os extents (áreas contíguas de blocos)
+   - Mostra a localização física e tamanho de cada extent
+   Necessita de privilégios de root para funcionar
+*/
 void mostrar_detalhes_fisicos(const char *caminho)
 {
     int fd = open(caminho, O_RDONLY);
@@ -65,6 +77,7 @@ void mostrar_detalhes_fisicos(const char *caminho)
         return;
     }
 
+    // Prepara estrutura para mapear os extents do arquivo
     size_t fiemap_size = sizeof(struct fiemap) + MAX_EXTENTS * sizeof(struct fiemap_extent);
     struct fiemap *fiemap = malloc(fiemap_size);
     if (!fiemap)
@@ -80,6 +93,7 @@ void mostrar_detalhes_fisicos(const char *caminho)
     fiemap->fm_flags = 0;
     fiemap->fm_extent_count = MAX_EXTENTS;
 
+    // Faz a chamada de sistema para obter o mapeamento físico
     if (ioctl(fd, FS_IOC_FIEMAP, fiemap) == 0)
     {
         if (fiemap->fm_mapped_extents > 0)
@@ -108,6 +122,11 @@ void mostrar_detalhes_fisicos(const char *caminho)
     close(fd);
 }
 
+/* Mostra os tempos de acesso do arquivo
+   - Último acesso
+   - Última modificação
+   - Última mudança de status
+*/
 static void mostrar_detalhes_temporais(const char *caminho)
 {
     struct stat file_stat;
@@ -120,6 +139,10 @@ static void mostrar_detalhes_temporais(const char *caminho)
     printf("Última alteração de status: %s", ctime(&file_stat.st_ctime));
 }
 
+/* Mostra permissões e dono do arquivo
+   - Modo no formato rwxrwxrwx
+   - IDs do usuário e grupo dono
+*/
 static void mostrar_detalhes_permissoes(const char *caminho)
 {
     struct stat file_stat;
@@ -131,7 +154,7 @@ static void mostrar_detalhes_permissoes(const char *caminho)
     printf("Usuário: %d\n", file_stat.st_uid);
     printf("Grupo: %d\n", file_stat.st_gid);
 
-    // Converter para formato rwxrwxrwx
+    // Converte permissões para formato legível (rwx)
     char perms[10];
     for (int i = 0; i < 9; i++)
     {
@@ -141,6 +164,9 @@ static void mostrar_detalhes_permissoes(const char *caminho)
     printf("Permissões: %s\n", perms);
 }
 
+/* Mostra detalhes especiais para links simbólicos
+   - Mostra para onde o link aponta
+*/
 static void mostrar_detalhes_especiais(const char *caminho)
 {
     struct stat file_stat;
@@ -160,6 +186,9 @@ static void mostrar_detalhes_especiais(const char *caminho)
     }
 }
 
+/* Função principal que mostra todas as informações do arquivo
+   Combina todos os detalhes em uma saída formatada
+*/
 void mostrar_info_arquivo(const char *diretorio_atual, const char *nome_arquivo)
 {
     char caminho[1024];
@@ -185,6 +214,7 @@ void mostrar_info_arquivo(const char *diretorio_atual, const char *nome_arquivo)
                                                   : S_ISLNK(file_stat.st_mode)   ? "Link Simbólico"
                                                                                  : "Tipo Especial");
 
+    // Mostra todas as categorias de informação
     mostrar_detalhes_estruturais(caminho);
     mostrar_detalhes_fisicos(caminho);
     mostrar_detalhes_temporais(caminho);
@@ -195,6 +225,11 @@ void mostrar_info_arquivo(const char *diretorio_atual, const char *nome_arquivo)
     getchar();
 }
 
+/* Cria um arquivo fragmentado para demonstração
+   - Cria arquivos temporários para ocupar espaço
+   - Remove alguns para criar "buracos"
+   - Cria um arquivo grande que ficará fragmentado
+*/
 void criar_arquivo_fragmentado(const char *diretorio_atual)
 {
     char caminho[1024];
@@ -202,34 +237,33 @@ void criar_arquivo_fragmentado(const char *diretorio_atual)
 
     printf("\nCriando arquivo fragmentado em: %s\n", caminho);
 
-    // Criação de arquivos temporários para forçar fragmentação
+    // Cria arquivos temporários para forçar fragmentação
     char temp1[1024], temp2[1024];
     snprintf(temp1, sizeof(temp1), "%s/temp1", diretorio_atual);
     snprintf(temp2, sizeof(temp2), "%s/temp2", diretorio_atual);
 
-    // Cria arquivos temporários
     printf("Criando arquivos temporários para forçar fragmentação...\n");
     system("dd if=/dev/zero of=temp1 bs=1M count=50 status=none");
     system("dd if=/dev/zero of=temp2 bs=1M count=50 status=none");
 
-    // Remove o primeiro temporário
     printf("Removendo primeiro arquivo temporário...\n");
     remove(temp1);
 
-    // Cria o arquivo fragmentado
     printf("Criando arquivo fragmentado (70MB)...\n");
     system("dd if=/dev/zero of=arquivo_fragmentado bs=1M count=70 status=none");
 
-    // Remove o segundo temporário
     printf("Limpando arquivos temporários...\n");
     remove(temp2);
 
     printf("\nArquivo fragmentado criado com sucesso!\n");
     printf("Use a opção 'I' para visualizar os extents físicos.\n");
     printf("\nPressione qualquer tecla para continuar...");
-    getchar(); // Para capturar o ENTER
+    getchar();
 }
 
+/* Limpa os arquivos criados para testes
+   Remove o arquivo fragmentado criado anteriormente
+*/
 void limpar_arquivos_teste(const char *diretorio_atual)
 {
     char caminho[1024];
@@ -238,6 +272,9 @@ void limpar_arquivos_teste(const char *diretorio_atual)
     printf("Arquivo fragmentado removido: %s\n", caminho);
 }
 
+/* Atualiza a mensagem de ajuda na parte inferior da tela
+   Mostra os comandos disponíveis para o usuário
+*/
 void atualizar_rodape_comandos()
 {
     printf("\n\033[1mComandos:\033[0m ");

@@ -6,72 +6,82 @@
 #include "interface.h"
 #include "comandos.h"
 
-// Variáveis para armazenar configuração original do terminal
+/* Guarda como o terminal estava antes de mexermos */
 static struct termios oldt;
 
-// Limpa a tela de forma portável
+/* Limpa a tela usando códigos especiais do terminal */
 void limpar_tela()
 {
-    printf("\033[2J\033[H"); // Sequências de escape ANSI
+    printf("\033[2J\033[H"); // Esses códigos fazem a mágica
 }
 
-// Exibe o cabeçalho com o diretório atual
+/* Mostra o cabeçalho bonitinho */
 void exibir_cabecalho(const char *diretorio_atual)
 {
-    printf("\033[1m"); // Fundo azul, texto em negrito
+    printf("\033[1m"); // Liga o negrito
     printf("=== Explorador de Arquivos ===\n");
     printf("Diretório: %s\n", diretorio_atual);
-    printf("\033[0m"); // Resetar cores
+    printf("\033[0m"); // Desliga formatação
 }
 
-// Exibe as entradas do diretório com realce na seleção
+/* Mostra os arquivos e pastas
+   - Destaca o item selecionado
+   - Colore pastas de azul
+*/
 void exibir_entradas(DirEntry *entries, int num_entradas, int selecionado)
 {
     printf("\n");
     for (int i = 0; i < num_entradas; i++)
     {
+        // Destaca o selecionado
         if (i == selecionado)
         {
-            printf("\033[7m"); // Texto reverso para seleção
+            printf("\033[7m"); // Inverte cores
         }
+        // Colore pastas
         else if (entries[i].is_dir)
         {
-            printf("\033[1;34m"); // Azul para diretórios
+            printf("\033[1;34m"); // Azul e negrito
         }
 
         printf("%s", entries[i].nome);
 
+        // Coloca barra no fim de pastas
         if (entries[i].is_dir)
         {
             printf("/");
         }
 
-        printf("\033[0m\n"); // Reset sempre no final
+        printf("\033[0m\n"); // Volta ao normal
     }
 }
 
-// Exibe a barra de ajuda
+/* Mostra os comandos disponíveis embaixo */
 void exibir_rodape()
 {
-    atualizar_rodape_comandos(); // Usa a função de comandos
+    atualizar_rodape_comandos(); // Pega a mensagem pronta
 }
-// Configura o terminal para modo raw
+
+/* Configura o terminal pra ler teclas direto
+   - Desliga o eco (não mostra o que digitamos)
+   - Lê teclas sem esperar Enter
+*/
 void configurar_terminal()
 {
     struct termios newt;
 
-    // Obtém configurações atuais
+    // Pega as configurações atuais
     tcgetattr(STDIN_FILENO, &oldt);
     newt = oldt;
 
-    // Desabilita eco e modo canônico (leitura caractere a caractere)
+    // Desliga modos padrão
     newt.c_lflag &= ~(ICANON | ECHO);
 
-    // Aplica novas configurações
+    // Aplica as mudanças
     tcsetattr(STDIN_FILENO, TCSANOW, &newt);
 }
 
-// Restaura configurações originais do terminal
+/* Volta o terminal ao que era antes */
 void restaurar_terminal()
 {
     tcsetattr(STDIN_FILENO, TCSANOW, &oldt);

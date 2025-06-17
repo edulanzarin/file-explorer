@@ -13,7 +13,7 @@
  */
 #include "navegacao.h"
 
-/* Funções de interface implementadas em interface.c */
+/* funções de interface implementadas em interface.c */
 void limpar_tela();
 void exibir_cabecalho(const char *dir_atual);
 void exibir_entradas(DirEntry *entries, int num_entradas, int selecionado);

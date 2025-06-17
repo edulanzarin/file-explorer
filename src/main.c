@@ -7,58 +7,58 @@
 #include <string.h>
 
 int main() {
-  // Variáveis principais
-  char dir_atual[MAX_PATH_LEN]; // Guarda onde estamos
-  DirEntry *entries = NULL;     // Lista de arquivos/pastas
-  int num_entradas = 0;         // Quantos itens tem na lista
-  int selecionado = 0;          // Item selecionado na tela
-  int sair = 0;                 // Flag pra saber quando fechar
+  // variáveis principais
+  char dir_atual[MAX_PATH_LEN]; // guarda onde estamos
+  DirEntry *entries = NULL;     // lista de arquivos/pastas
+  int num_entradas = 0;         // quantos itens tem na lista
+  int selecionado = 0;          // item selecionado na tela
+  int sair = 0;                 // flag pra saber quando fechar
 
-  // Prepara o terminal pra ler teclas direto
+  // prepara o terminal pra ler teclas direto
   configurar_terminal();
 
-  // Começa no diretório atual do programa
+  // começa no diretório atual do programa
   obter_dir_atual(dir_atual, sizeof(dir_atual));
 
-  // Pega a lista de coisas que tem nesse diretório
+  // pega a lista de coisas que tem nesse diretório
   num_entradas = listar_diretorio(dir_atual, &entries);
 
-  // Loop principal - roda até o usuário pedir pra sair
+  // loop principal - roda até o usuário pedir pra sair
   while (!sair) {
-    // Limpa a tela e mostra tudo de novo
+    // limpa a tela e mostra tudo de novo
     limpar_tela();
-    exibir_cabecalho(dir_atual);                         // Título e caminho
-    exibir_entradas(entries, num_entradas, selecionado); // Lista de arquivos
-    atualizar_rodape_comandos();                         // Ajuda dos comandos
+    exibir_cabecalho(dir_atual);                         // título e caminho
+    exibir_entradas(entries, num_entradas, selecionado); // lista de arquivos
+    atualizar_rodape_comandos();                         // ajuda dos comandos
 
-    // Espera o usuário apertar alguma tecla
+    // espera o usuário apertar alguma tecla
     char c = getchar();
 
-    // Verifica o que foi apertado
+    // verifica o que foi apertado
     switch (c) {
-    case '\033': // Tecla especial (setas)
-      getchar(); // Descarta o '['
+    case '\033': // tecla especial (setas)
+      getchar(); // descarta o '['
       switch (getchar()) {
-      case 'A': // Seta pra cima
+      case 'A': // seta pra cima
         if (selecionado > 0)
           selecionado--;
         break;
-      case 'B': // Seta pra baixo
+      case 'B': // seta pra baixo
         if (selecionado < num_entradas - 1)
           selecionado++;
         break;
       }
       break;
 
-    case '\n': // Enter - tenta entrar na pasta selecionada
+    case '\n': // enter - tenta entrar na pasta selecionada
       if (num_entradas > 0) {
         char caminho_selecionado[MAX_PATH_LEN];
         snprintf(caminho_selecionado, sizeof(caminho_selecionado), "%s/%s",
                  dir_atual, entries[selecionado].nome);
 
-        // Só entra se for mesmo uma pasta
+        // só entra se for mesmo uma pasta
         if (eh_diretorio(caminho_selecionado)) {
-          // Verifica se o caminho não é muito grande
+          // verifica se o caminho não é muito grande
           size_t needed =
               snprintf(NULL, 0, "%s/%s", dir_atual, entries[selecionado].nome);
           if (needed >= MAX_PATH_LEN) {
@@ -67,40 +67,40 @@ int main() {
             break;
           }
 
-          // Atualiza pra nova pasta
+          // atualiza pra nova pasta
           strncpy(dir_atual, caminho_selecionado, MAX_PATH_LEN);
 
-          // Pega os arquivos da nova pasta
+          // pega os arquivos da nova pasta
           DirEntry *novas_entradas = NULL;
           int novo_num = listar_diretorio(dir_atual, &novas_entradas);
 
-          if (novo_num >= 0) // Se deu certo
+          if (novo_num >= 0) // se deu certo
           {
-            free(entries); // Limpa a lista antiga
+            free(entries); // limpa a lista antiga
             entries = novas_entradas;
             num_entradas = novo_num;
-            selecionado = 0; // Seleciona o primeiro item
+            selecionado = 0; // seleciona o primeiro item
           } else {
-            free(novas_entradas); // Se deu erro, limpa
+            free(novas_entradas); // se deu erro, limpa
           }
         } else {
-          // Avisa se tentou entrar em arquivo (não pasta)
+          // avisa se tentou entrar em arquivo (não pasta)
           printf("\nNão é um diretório, pressione uma tecla para continuar...");
           getchar();
         }
       }
       break;
 
-    case 'i': // Mostra info do arquivo selecionado
+    case 'i': // mostra info do arquivo selecionado
       if (num_entradas > 0) {
         mostrar_info_arquivo(dir_atual, entries[selecionado].nome);
       }
       break;
 
-    case 'f': // Cria arquivo fragmentado (pra teste)
+    case 'f': // cria arquivo fragmentado (pra teste)
       if (num_entradas > 0) {
         criar_arquivo_fragmentado(dir_atual);
-        // Atualiza a lista de arquivos
+        // atualiza a lista de arquivos
         DirEntry *novas_entradas = NULL;
         int novo_num = listar_diretorio(dir_atual, &novas_entradas);
         if (novo_num >= 0) {
@@ -113,18 +113,18 @@ int main() {
       }
       break;
 
-    case 'q':                           // Sai do programa
-      limpar_arquivos_teste(dir_atual); // Limpa lixo de teste
+    case 'q':                           // sai do programa
+      limpar_arquivos_teste(dir_atual); // limpa arquivo de teste
       sair = 1;
       break;
     }
   }
 
-  // Limpeza antes de fechar
+  // limpeza antes de fechar
   if (entries != NULL) {
-    free(entries); // Libera a memória da lista
+    free(entries); // libera a memória da lista
   }
-  restaurar_terminal(); // Volta o terminal ao normal
+  restaurar_terminal(); // volta o terminal ao normal
 
   return 0;
 }

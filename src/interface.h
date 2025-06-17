@@ -1,7 +1,6 @@
 #ifndef INTERFACE_H
 #define INTERFACE_H
 
-/* includes necessários que são usados em interface.c */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

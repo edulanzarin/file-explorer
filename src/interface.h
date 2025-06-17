@@ -3,22 +3,21 @@
 
 #include "navegacao.h"
 
-// Limpa a tela do terminal
 void limpar_tela();
 
-// Exibe o cabeçalho da interface
 void exibir_cabecalho(const char *diretorio_atual);
 
-// Exibe as entradas do diretório
+/* Mostra a lista de arquivos/pastas do diretório
+ * Recebe as entradas, quantas tem e qual tá selecionada pra destacar
+ */
 void exibir_entradas(DirEntry *entries, int num_entradas, int selecionado);
 
-// Exibe a barra de ajuda na parte inferior
 void exibir_rodape();
 
-// Configura o terminal para modo raw (para entrada sem esperar por Enter)
+/* Muda o terminal pro modo raw, pra pegar entrada na hora, sem esperar Enter */
 void configurar_terminal();
 
-// Restaura as configurações originais do terminal
+/* Volta o terminal pro jeito normal depois que a gente mexeu */
 void restaurar_terminal();
 
 #endif // INTERFACE_H

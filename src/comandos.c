@@ -342,26 +342,34 @@ void criar_arquivo_fragmentado(const char *dir_atual) {
   printf("\nCriando arquivo fragmentado em: %s\n", caminho);
 
   /*
-   * ceclara dois buffers temp1 e temp2 de tamanho 1024 para armazenar caminhos
+   * declara dois buffers temp1 e temp2 de tamanho 1024 para armazenar caminhos
    * dos arquivos temporários temp1 e temp2 dentro do diretório atual
    *
    * esses arquivos temporários serão criados pra ocupar espaço no disco,
    * quebrando a área livre em blocos dispersos
    *
-   * blocos no disco antes:
-   * [ LIVRE ][ LIVRE ][ LIVRE ][ LIVRE ][ LIVRE ]
+   * passo 0: disco totalmente livre:
+   * ┌───────┬───────┬───────┬───────┬───────┐
+   * │ LIVRE │ LIVRE │ LIVRE │ LIVRE │ LIVRE │
+   * └───────┴───────┴───────┴───────┴───────┘
    *
    * passo 1: criar temp1 e temp2 -> ocupa espaço
    * blocos no disco após criação:
-   * [ TEMP1 ][ TEMP1 ][ TEMP2 ][ TEMP2 ][ LIVRE ]
+   * ┌───────┬───────┬───────┬───────┬───────┐
+   * │ TEMP1 │ TEMP1 │ TEMP2 │ TEMP2 │ LIVRE │
+   * └───────┴───────┴───────┴───────┴───────┘
    *
-   * passo 2: deletar temp1 e temp2 -> cria buraco
+   * passo 2: deletar temp1 -> cria buraco
    * blocos no disco após deleção:
-   * [ LIVRE ][ LIVRE ][ TEMP2 ][ TEMP2 ][ LIVRE ]
+   * ┌───────┬───────┬───────┬───────┬───────┐
+   * │ LIVRE │ LIVRE │ TEMP2 │ TEMP2 │ LIVRE │
+   * └───────┴───────┴───────┴───────┴───────┘
    *
    * passo 3: criar arquivo grande -> espalhado nos blocos livres
    * blocos no disco após criar arquivo_fragmentado:
-   * [ FRAG1 ][ FRAG2 ][ TEMP2 ][ TEMP2 ][ FRAG3 ]
+   * ┌───────┬───────┬───────┬───────┬───────┐
+   * │ FRAG1 │ FRAG2 │ TEMP2 │ TEMP2 │ FRAG3 │
+   * └───────┴───────┴───────┴───────┴───────┘
    */
   char temp1[1024], temp2[1024];
   snprintf(temp1, sizeof(temp1), "%s/temp1", dir_atual);
@@ -379,12 +387,7 @@ void criar_arquivo_fragmentado(const char *dir_atual) {
   system("dd if=/dev/zero of=temp1 bs=1M count=50 status=none");
   system("dd if=/dev/zero of=temp2 bs=1M count=50 status=none");
 
-  /*
-   * deleta o arquivo temp1
-
-   * blocos no disco após deleção do arquivo TEMP1:
-   * [ LIVRE (ex-TEMP1) ][ TEMP2 ][ LIVRE ]
-   */
+  /* deleta o arquivo temp1 */
   printf("Removendo primeiro arquivo temporário...\n");
   remove(temp1);
 
@@ -392,9 +395,6 @@ void criar_arquivo_fragmentado(const char *dir_atual) {
    * cria um novo arquivo chamado arquivo_fragmentado de 70 MB
    * só tinha 50 MB contíguos livres, os outros 20 estão depois de temp2
    * o sistema de arquivos vai dividir esse arquivo em blocos separados
-   *
-   * blocos no disco após criação do arquivo_fragmentado:
-   * [ PARTE1 (50 MB) ][ TEMP2 ][ PARTE2 (20 MB) ]
    */
   printf("Criando arquivo fragmentado (70MB)...\n");
   system("dd if=/dev/zero of=arquivo_fragmentado bs=1M count=70 status=none");

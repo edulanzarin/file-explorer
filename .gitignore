@@ -3,3 +3,5 @@ comandos.o
 interface.o
 main.o
 navegacao.o
+file_explorer
+teste.txt

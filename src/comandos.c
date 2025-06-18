@@ -29,12 +29,33 @@ static void mostrar_detalhes_estruturais(const char *caminho) {
   printf("Tamanho: %ld bytes\n", file_stat.st_size);
   /* quantidade de blocos alocados no disco para armazenar o arquivo */
   printf("Blocos alocados: %ld (blocos de 512 bytes)\n", file_stat.st_blocks);
-  /* tamanho preferido de bloco para I/O */
+  /* tamanho do bloco em bytes */
   printf("Tamanho do bloco: %ld bytes\n", file_stat.st_blksize);
 
-  /* representam o dispositivo onde o arquivo está armazenado
-   * major: identifica o driver do dispositivo ex: disco rígido, SSD, etc
-   * minor: identifica o dispositivo específico controlado por esse driver
+  /*
+   * o campo 'st_dev' indica o dispositivo onde o arquivo está armazenado
+   *
+   *   ┌────────────┬────────────┐
+   *   │   major    │   minor    │
+   *   └────────────┴────────────┘
+   *        ^            ^
+   *        |            |
+   *     tipo do     unidade específica
+   *     driver       controlada por ele
+   *
+   * major: identifica o driver do dispositivo
+   *   - ex: HD SATA, SSD, NVMe, pendrive, tmpfs, etc
+   *
+   * minor: identifica o dispositivo ou partição específica
+   *   - ex: sda1, sda2, nvme0n1p1, etc
+   *
+   * formam a identificação única do dispositivo
+   *   - exemplo:
+   *       259,3 -> driver NVMe (major 259), partição 3 (minor 3)
+   *       0,42  -> sistema virtual, ex: tmpfs (major 0), instância 42
+   *
+   * ajuda a saber em que dispositivo físico ou lógico o arquivo está realmente
+   * armazenado
    */
   printf("Dispositivo: %u,%u (major/minor)\n", major(file_stat.st_dev),
          minor(file_stat.st_dev));
@@ -50,7 +71,9 @@ void mostrar_detalhes_fisicos(const char *caminho) {
 
   /* abre o arquivo só para leitura */
   int fd = open(caminho, O_RDONLY);
-  /* se o arquivo abrir, o fd nunca será menor que 0
+  /*
+   * a função open() retorna um fd que é um referência a um arquivo aberto
+   * se o arquivo abrir, o fd nunca será menor que 0
    * porém 0, 1 e 2 são reservados para o sistema
    * 0 - stdin
    * 1 - stdout

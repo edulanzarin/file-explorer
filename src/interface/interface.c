@@ -1,4 +1,4 @@
-#include "interface.h"
+#include "../include/interface.h"
 
 /* Guarda como o terminal estava antes de mexermos */
 static struct termios oldt;

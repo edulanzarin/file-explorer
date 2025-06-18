@@ -1,6 +1,6 @@
-#include "comandos.h"
-#include "interface.h"
-#include "navegacao.h"
+#include "./include/comandos.h"
+#include "./include/interface.h"
+#include "./include/navegacao.h"
 
 int main() {
   /* variáveis principais */
@@ -10,7 +10,7 @@ int main() {
   int selecionado = 0;          /* item selecionado na tela */
   int sair = 0;                 /* flag pra saber quando fechar */
 
-  /* 
+  /*
    * começa no diretório atual
    * pega a lista de coisas que tem dentro
    */
@@ -20,11 +20,11 @@ int main() {
 
   /* loop principal - roda até o usuário pedir pra sair "Q" */
   while (!sair) {
-    
+
     limpar_tela();                                       /* limpa a tela */
     exibir_cabecalho(dir_atual);                         /* título e caminho */
     exibir_entradas(entries, num_entradas, selecionado); /* ista de arquivos */
-    atualizar_rodape_comandos();                         /* ajuda dos comandos */
+    atualizar_rodape_comandos(); /* ajuda dos comandos */
 
     /* espera o apertar alguma tecla */
     char c = getchar();
@@ -59,7 +59,7 @@ int main() {
         if (selecionado > 0)
           selecionado--;
         break;
-      case 'B':            /* seta pra baixo */
+      case 'B': /* seta pra baixo */
         if (selecionado < num_entradas - 1)
           selecionado++;
         break;
@@ -83,28 +83,28 @@ int main() {
             break;
           }
 
-          /* 
-           * atualiza pra nova pasta 
-           * strncpy copia string com limite de segurança "MAX_PATH_LEN" 
+          /*
+           * atualiza pra nova pasta
+           * strncpy copia string com limite de segurança "MAX_PATH_LEN"
            * para evitar estouro de buffer
            */
           strncpy(dir_atual, caminho_selecionado, MAX_PATH_LEN);
 
-          /* 
-           * cria um ponteiro para vetor DirEntry que começa NULL 
+          /*
+           * cria um ponteiro para vetor DirEntry que começa NULL
            * pq a função listar_diretorio() preenche esse ponteiro
            */
           DirEntry *novas_entradas = NULL;
           int novo_num = listar_diretorio(dir_atual, &novas_entradas);
 
-          if (novo_num >= 0)          /* se deu certo >= 0 */
+          if (novo_num >= 0) /* se deu certo >= 0 */
           {
             free(entries);            /* limpa lista antiga */
             entries = novas_entradas; /* atualiza ponteiro */
             num_entradas = novo_num;  /* atualiza qtd de entradas */
             selecionado = 0;          /* seleciona o primeiro item */
           } else {
-            free(novas_entradas);     /* se deu erro < 0 */
+            free(novas_entradas); /* se deu erro < 0 */
           }
         } else {
           /* caso não seja uma pasta */
@@ -113,9 +113,9 @@ int main() {
         }
       }
       break;
-    
-    /* 
-     * chama a função geral de "comandos.c" que mostra as informações 
+
+    /*
+     * chama a função geral de "comandos.c" que mostra as informações
      * do arquivo selecionado
      */
     case 'i': /* tecla "I" */
@@ -152,9 +152,9 @@ int main() {
 
   /* verifica se a lista entries foi alocada e libera ela */
   if (entries != NULL) {
-    free(entries); 
+    free(entries);
   }
-  restaurar_terminal(); 
+  restaurar_terminal();
 
   return 0;
 }

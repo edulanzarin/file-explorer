@@ -1,4 +1,4 @@
-#include "navegacao.h"
+#include "../include/navegacao.h"
 
 /* verifica se é uma pasta */
 int eh_diretorio(const char *caminho) {

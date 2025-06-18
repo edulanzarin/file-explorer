@@ -6,7 +6,7 @@ CFLAGS = -Wall -Wextra -std=c11 -D_GNU_SOURCE
 LIBS =  
 
 # lista dos arquivos fonte ".c"
-SRC = src/main.c src/interface.c src/navegacao.c src/comandos.c
+SRC = src/main.c src/interface/interface.c src/core/navegacao.c src/core/comandos.c
 
 # Converte os .c em .o
 OBJ = $(SRC:.c=.o)

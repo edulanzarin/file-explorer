@@ -1,4 +1,4 @@
-#include "comandos.h"
+#include "../include/comandos.h"
 
 /*
  * mostra detalhes estruturais do arquivo

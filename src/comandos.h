@@ -42,7 +42,6 @@
  * usar muitos extents aumenta o consumo de memória
  * mas permite mapear arquivos maiores fragmentados em muitos blocos
  */
-
 #define MAX_EXTENTS 512
 
 /*

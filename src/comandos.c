@@ -71,6 +71,7 @@ void mostrar_detalhes_fisicos(const char *caminho) {
 
   /* abre o arquivo só para leitura */
   int fd = open(caminho, O_RDONLY);
+
   /*
    * a função open() retorna um fd que é um referência a um arquivo aberto
    * se o arquivo abrir, o fd nunca será menor que 0
@@ -85,12 +86,15 @@ void mostrar_detalhes_fisicos(const char *caminho) {
     return;
   }
 
+  // printf("fd = %d\n", fd);
+
   /*
    * calcula o tamanho em bytes da memória necessária para armazenar a estrutura
    * fiemap com espaço para MAX_EXTENTS = 512 (definido em comandos.h)
    */
   size_t fiemap_size =
       sizeof(struct fiemap) + MAX_EXTENTS * sizeof(struct fiemap_extent);
+      
   /*
    * aloca dinamicamente um bloco de memória com o tamanho calculado e guarda o
    * endereço no ponteiro fiemap.

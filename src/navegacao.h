@@ -8,6 +8,7 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <limits.h>
 
 /* tamanho máximo que um caminho de arquivo pode ter */
 #define MAX_PATH_LEN 1024

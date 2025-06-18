@@ -1,35 +1,28 @@
 # Compilador que vamos usar
 CC = gcc
-
-# Opções de compilação:
-# - Wall e Wextra: ativa avisos importantes
-# - std=c11: usa o padrão C mais recente
-# - D_GNU_SOURCE: habilita recursos extras do GNU/Linux
 CFLAGS = -Wall -Wextra -std=c11 -D_GNU_SOURCE
 
-# Bibliotecas adicionais (deixamos vazio por enquanto)
+# não tem bibliotecas adicionais
 LIBS =  
 
-# Lista dos arquivos fonte (.c) que compõem o projeto
+# lista dos arquivos fonte ".c"
 SRC = src/main.c src/interface.c src/navegacao.c src/comandos.c
 
-# Converte os .c em .o (arquivos objeto)
+# Converte os .c em .o
 OBJ = $(SRC:.c=.o)
 
-# Nome do programa executável final
+# nome do programa executável
 EXEC = file_explorer
 
-# Regra principal - compila tudo
+# regra principal - compila tudo
 all: $(EXEC)
 
-# Como construir o executável final:
-# Junta todos os .o e gera o programa
+# junta todos os .o e gera o programa
 $(EXEC): $(OBJ)
 	$(CC) $(CFLAGS) $(OBJ) -o $(EXEC) $(LIBS)
 
-# Limpeza - remove os arquivos temporários e o executável
 clean:
 	rm -f $(OBJ) $(EXEC)
 
-# Indica que 'all' e 'clean' são regras especiais, não arquivos
+# indica que 'all' e 'clean' são regras especiais e não arquivos
 .PHONY: all clean

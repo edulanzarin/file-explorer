@@ -1,10 +1,6 @@
 #include "comandos.h"
 #include "interface.h"
 #include "navegacao.h"
-#include <limits.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 int main() {
   /* variáveis principais */

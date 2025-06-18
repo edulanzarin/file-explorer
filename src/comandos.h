@@ -1,19 +1,19 @@
 #ifndef COMANDOS_H
 #define COMANDOS_H
 
-#include <fcntl.h>         /* funções para abrir arquivos */
-#include <linux/fiemap.h>  /* mapeamento de extents */
-#include <linux/fs.h>      /* mapeamento de blocos */
-#include <linux/magic.h>   /* números mágicos de sistemas de arquivos */
 #include <stdio.h>         /* entrada e saída padrão */
 #include <stdlib.h>        /* utilitários gerais */
 #include <string.h>        /* manipulação de strings e memória */
+#include <fcntl.h>         /* funções para abrir arquivos */
+#include <unistd.h>        /* chamadas POSIX */
+#include <time.h>          /* manipulação de tempo e datas */
 #include <sys/ioctl.h>     /* controle avançado de arquivos */
 #include <sys/stat.h>      /* obter metadados de arquivos */
 #include <sys/sysmacros.h> /* major() e minor() */
 #include <sys/vfs.h>       /* informações do sistema de arquivos */
-#include <time.h>          /* manipulação de tempo e datas */
-#include <unistd.h>        /* chamadas POSIX */
+#include <linux/fiemap.h>  /* mapeamento de extents */
+#include <linux/fs.h>      /* mapeamento de blocos */
+#include <linux/magic.h>   /* números mágicos de sistemas de arquivos */
 
 /*
  * define FIEMAP_EXTENT_INLINE como 0x00000080

@@ -178,9 +178,9 @@ static void mostrar_detalhes_permissoes(const char *caminho) {
    *    │   │   │   └───└───└─────────────────────────── usuário (rwx)
    *    │   │   │
    *  bits especiais:
-   *   - setuid (04000) -> executa como dono
-   *   - setgid (02000) -> executa como grupo
-   *   - sticky (01000) -> controle de escrita em pastas públicas
+   *   - setuid -> executa como dono
+   *   - setgid -> executa como grupo
+   *   - sticky -> controle de escrita em pastas públicas
    *
    *  exemplo:
    *    0755 = rwxr-xr-x
@@ -204,15 +204,15 @@ static void mostrar_detalhes_permissoes(const char *caminho) {
    * ┌────┬──────────────┬──────────────┬───────────────┬───────────┐
    * │ i  │ (1 << (8-i)) │ verifica bit │ i % 3 ("rwx") │ resultado │
    * ├────┼──────────────┼──────────────┼───────────────┼───────────┤
-   * │ 0  │  100000000   │    bit 8     │    0 -> 'r'    │  1 -> 'r'  │
-   * │ 1  │  010000000   │    bit 7     │    1 -> 'w'    │  1 -> 'w'  │
-   * │ 2  │  001000000   │    bit 6     │    2 -> 'x'    │  1 -> 'x'  │
-   * │ 3  │  000100000   │    bit 5     │    0 -> 'r'    │  1 -> 'r'  │
-   * │ 4  │  000010000   │    bit 4     │    1 -> 'w'    │  1 -> 'w'  │
-   * │ 5  │  000001000   │    bit 3     │    2 -> 'x'    │  1 -> 'x'  │
-   * │ 6  │  000000100   │    bit 2     │    0 -> 'r'    │  1 -> 'r'  │
-   * │ 7  │  000000010   │    bit 1     │    1 -> 'w'    │  1 -> 'w'  │
-   * │ 8  │  000000001   │    bit 0     │    2 -> 'x'    │  1 -> 'x'  │
+   * │ 0  │  100000000   │    bit 8     │    0 -> 'r'   │ 1 -> 'r'  │
+   * │ 1  │  010000000   │    bit 7     │    1 -> 'w'   │ 1 -> 'w'  │
+   * │ 2  │  001000000   │    bit 6     │    2 -> 'x'   │ 1 -> 'x'  │
+   * │ 3  │  000100000   │    bit 5     │    0 -> 'r'   │ 1 -> 'r'  │
+   * │ 4  │  000010000   │    bit 4     │    1 -> 'w'   │ 1 -> 'w'  │
+   * │ 5  │  000001000   │    bit 3     │    2 -> 'x'   │ 1 -> 'x'  │
+   * │ 6  │  000000100   │    bit 2     │    0 -> 'r'   │ 1 -> 'r'  │
+   * │ 7  │  000000010   │    bit 1     │    1 -> 'w'   │ 1 -> 'w'  │
+   * │ 8  │  000000001   │    bit 0     │    2 -> 'x'   │ 1 -> 'x'  │
    * └────┴──────────────┴──────────────┴───────────────┴───────────┘
    */
   for (int i = 0; i < 9; i++) {

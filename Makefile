@@ -1,28 +1,40 @@
-# Compilador que vamos usar
+# Compilador e flags
 CC = gcc
 CFLAGS = -Wall -Wextra -std=c11 -D_GNU_SOURCE
 
-# não tem bibliotecas adicionais
-LIBS =  
+# Diretório de saída
+OUTDIR = out
 
-# lista dos arquivos fonte ".c"
-SRC = src/main.c src/interface/interface.c src/core/navegacao.c src/core/comandos.c
+# Lista automaticamente todos os .c dentro de src/ e subpastas
+SRC := $(wildcard src/**/*.c) $(wildcard src/*.c)
 
-# Converte os .c em .o
-OBJ = $(SRC:.c=.o)
 
-# nome do programa executável
-EXEC = file_explorer
+# Cria a lista de .o correspondentes em out/
+OBJ := $(patsubst src/%, $(OUTDIR)/%, $(SRC:.c=.o))
+OBJ := $(notdir $(OBJ))
+OBJ := $(addprefix $(OUTDIR)/, $(OBJ))
 
-# regra principal - compila tudo
+# Nome do executável
+EXEC = $(OUTDIR)/file_explorer
+
+# Regra principal
 all: $(EXEC)
 
-# junta todos os .o e gera o programa
-$(EXEC): $(OBJ)
-	$(CC) $(CFLAGS) $(OBJ) -o $(EXEC) $(LIBS)
+# Linka os .o e gera o executável
+$(EXEC): $(OBJ) | $(OUTDIR)
+	$(CC) $(CFLAGS) $(OBJ) -o $(EXEC)
 
+# Compila cada .c em .o dentro de out/
+$(OUTDIR)/%.o: 
+	@mkdir -p $(OUTDIR)
+	$(CC) $(CFLAGS) -c $(firstword $(filter %/$*.c, $(SRC))) -o $@
+
+# Garante que a pasta out exista
+$(OUTDIR):
+	mkdir -p $(OUTDIR)
+
+# Limpa os binários
 clean:
-	rm -f $(OBJ) $(EXEC)
+	rm -rf $(OUTDIR)
 
-# indica que 'all' e 'clean' são regras especiais e não arquivos
 .PHONY: all clean

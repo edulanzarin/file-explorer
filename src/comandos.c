@@ -98,6 +98,12 @@ void mostrar_detalhes_fisicos(const char *caminho) {
       /*
        * percorre cada extent encontrada e para cada extent imprime offset
        * físico em bytes e quantos bytes ele ocupa no disco
+       *
+       * [Extent 0] --> Offset físico: fe_physical[0], Tamanho: fe_length[0]
+       * [Extent 1] --> Offset físico: fe_physical[1], Tamanho: fe_length[1]
+       * [Extent 2] --> Offset físico: fe_physical[2], Tamanho: fe_length[2]
+       *  ...
+       * [Extent N] --> Offset físico: fe_physical[N], Tamanho: fe_length[N]
        */
       for (unsigned int i = 0; i < fiemap->fm_mapped_extents; i++) {
         printf("  Extent %u: offset físico %llu, comprimento %llu bytes\n", i,
@@ -117,9 +123,9 @@ void mostrar_detalhes_fisicos(const char *caminho) {
 
 /*
  * mostra os tempos de acesso
- * - último acesso
- * - última modificação
- * - última mudança de status
+ * - último acesso              (st_atime)
+ * - última modificação         (st_mtime)
+ * - última mudança de status   (st_ctime)
  */
 static void mostrar_detalhes_temporais(const char *caminho) {
 

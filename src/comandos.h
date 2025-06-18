@@ -15,18 +15,35 @@
 #include <time.h>          /* manipulação de tempo e datas */
 #include <unistd.h>        /* chamadas POSIX */
 
-/* 0x00000080 = 10000000
- * só o oitavo bit tá ligado, o kernel usa isso pra saber que os dados são
- * inline
+/*
+ * define FIEMAP_EXTENT_INLINE como 0x00000080
+ * binário: apenas o 8º bit está ligado
+ *
+ * representação dos 8 bits (1 byte):
+ *
+ *  bit:     7   6   5   4   3   2   1   0
+ *         ┌───┬───┬───┬───┬───┬───┬───┬───┐
+ *  valor: │ 1 │ 0 │ 0 │ 0 │ 0 │ 0 │ 0 │ 0 │
+ *         └───┴───┴───┴───┴───┴───┴───┴───┘
+ *           ↑
+ *           FIEMAP_EXTENT_INLINE = bit 7 ligado
+ *
+ * os dados estão armazenados dentro do próprio inode e não em blocos separados
+ * usado para arquivos muito pequenos que cabem direto na estrutura do inode
  */
-#define FIEMAP_EXTENT_INLINE 0x00000080 /* armazenado no próprio inode */
+#define FIEMAP_EXTENT_INLINE 0x00000080
 
 /*
- * tamanho geralmente de 32 a 64 bytes
- * a quantidade de memória para 512 extents seria de aproximadamente
- * 512 * 64 = 32768 bytes
+ * define MAX_EXTENTS como 512
+ * geralmente cada extent ocupa entre 32 a 64 bytes
+ *  ┌───────────────────────────────────────────┐
+ *  │ 512 extents × 64 bytes = 32 KB de memória │
+ *  └───────────────────────────────────────────┘
+ * usar muitos extents aumenta o consumo de memória
+ * mas permite mapear arquivos maiores fragmentados em muitos blocos
  */
-#define MAX_EXTENTS 512 /* número máximo de extents */
+
+#define MAX_EXTENTS 512
 
 /*
  * ~0ULL é o maior valor possível para um número 64-bit.

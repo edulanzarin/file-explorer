@@ -7,100 +7,134 @@
 #include <string.h>
 
 int main() {
-  // variáveis principais
-  char dir_atual[MAX_PATH_LEN]; // guarda onde estamos
-  DirEntry *entries = NULL;     // lista de arquivos/pastas
-  int num_entradas = 0;         // quantos itens tem na lista
-  int selecionado = 0;          // item selecionado na tela
-  int sair = 0;                 // flag pra saber quando fechar
+  /* variáveis principais */
+  char dir_atual[MAX_PATH_LEN]; /* guarda onde estamos */
+  DirEntry *entries = NULL;     /* lista de arquivos/pastas */
+  int num_entradas = 0;         /* quantos itens tem na lista */
+  int selecionado = 0;          /* item selecionado na tela */
+  int sair = 0;                 /* flag pra saber quando fechar */
 
-  // prepara o terminal pra ler teclas direto
+  /* 
+   * começa no diretório atual
+   * pega a lista de coisas que tem dentro
+   */
   configurar_terminal();
-
-  // começa no diretório atual do programa
   obter_dir_atual(dir_atual, sizeof(dir_atual));
-
-  // pega a lista de coisas que tem nesse diretório
   num_entradas = listar_diretorio(dir_atual, &entries);
 
-  // loop principal - roda até o usuário pedir pra sair
+  /* loop principal - roda até o usuário pedir pra sair "Q" */
   while (!sair) {
-    // limpa a tela e mostra tudo de novo
-    limpar_tela();
-    exibir_cabecalho(dir_atual);                         // título e caminho
-    exibir_entradas(entries, num_entradas, selecionado); // lista de arquivos
-    atualizar_rodape_comandos();                         // ajuda dos comandos
+    
+    limpar_tela();                                       /* limpa a tela */
+    exibir_cabecalho(dir_atual);                         /* título e caminho */
+    exibir_entradas(entries, num_entradas, selecionado); /* ista de arquivos */
+    atualizar_rodape_comandos();                         /* ajuda dos comandos */
 
-    // espera o usuário apertar alguma tecla
+    /* espera o apertar alguma tecla */
     char c = getchar();
 
-    // verifica o que foi apertado
+    /*
+     * verifica tecla a partir do código ASCII recebido
+     * pressionar uma tecla de seta envia uma sequência de 3 caracteres:
+     *
+     *     ┌──────┬─────┬─────┐
+     *     │'\033'│ '[' │ 'A' │ <- seta pra cima
+     *     └──────┴─────┴─────┘
+     *       ESC    CSI  Código
+     *
+     * - '\033' é o código ESC que sinaliza o início da sequência
+     * - '[' é o "Control Sequence Introducer" (CSI) usado em ANSI
+     * - 'A', 'B', 'C', 'D' identificam as setas:
+     *
+     *     ┌─────┬────────────┐
+     *     │ cód │ seta       │
+     *     ├─────┼────────────┤
+     *     │ 'A' │ (cima)     │
+     *     │ 'B' │ (baixo)    │
+     *     │ 'C' │ (direita)  │
+     *     │ 'D' │ (esquerda) │
+     *     └─────┴────────────┘
+     */
     switch (c) {
-    case '\033': // tecla especial (setas)
-      getchar(); // descarta o '['
-      switch (getchar()) {
-      case 'A': // seta pra cima
+    case '\033':           /* ESC: início de sequência especial */
+      getchar();           /* descarta o '[' */
+      switch (getchar()) { /* pega o terceiro caractere */
+      case 'A':            /* seta pra cima */
         if (selecionado > 0)
           selecionado--;
         break;
-      case 'B': // seta pra baixo
+      case 'B':            /* seta pra baixo */
         if (selecionado < num_entradas - 1)
           selecionado++;
         break;
       }
       break;
 
-    case '\n': // enter - tenta entrar na pasta selecionada
+    case '\n': /* ENTER */
       if (num_entradas > 0) {
         char caminho_selecionado[MAX_PATH_LEN];
         snprintf(caminho_selecionado, sizeof(caminho_selecionado), "%s/%s",
                  dir_atual, entries[selecionado].nome);
 
-        // só entra se for mesmo uma pasta
+        /* só entra se for mesmo uma pasta */
         if (eh_diretorio(caminho_selecionado)) {
-          // verifica se o caminho não é muito grande
+          /* verifica se o caminho não é muito grande */
           size_t needed =
               snprintf(NULL, 0, "%s/%s", dir_atual, entries[selecionado].nome);
           if (needed >= MAX_PATH_LEN) {
-            printf("\nErro: Caminho muito longo (max %d caracteres)\n",
+            printf("\nErro: Caminho muito longo max %d caracteres\n",
                    MAX_PATH_LEN - 1);
             break;
           }
 
-          // atualiza pra nova pasta
+          /* 
+           * atualiza pra nova pasta 
+           * strncpy copia string com limite de segurança "MAX_PATH_LEN" 
+           * para evitar estouro de buffer
+           */
           strncpy(dir_atual, caminho_selecionado, MAX_PATH_LEN);
 
-          // pega os arquivos da nova pasta
+          /* 
+           * cria um ponteiro para vetor DirEntry que começa NULL 
+           * pq a função listar_diretorio() preenche esse ponteiro
+           */
           DirEntry *novas_entradas = NULL;
           int novo_num = listar_diretorio(dir_atual, &novas_entradas);
 
-          if (novo_num >= 0) // se deu certo
+          if (novo_num >= 0)          /* se deu certo >= 0 */
           {
-            free(entries); // limpa a lista antiga
-            entries = novas_entradas;
-            num_entradas = novo_num;
-            selecionado = 0; // seleciona o primeiro item
+            free(entries);            /* limpa lista antiga */
+            entries = novas_entradas; /* atualiza ponteiro */
+            num_entradas = novo_num;  /* atualiza qtd de entradas */
+            selecionado = 0;          /* seleciona o primeiro item */
           } else {
-            free(novas_entradas); // se deu erro, limpa
+            free(novas_entradas);     /* se deu erro < 0 */
           }
         } else {
-          // avisa se tentou entrar em arquivo (não pasta)
+          /* caso não seja uma pasta */
           printf("\nNão é um diretório, pressione uma tecla para continuar...");
           getchar();
         }
       }
       break;
-
-    case 'i': // mostra info do arquivo selecionado
+    
+    /* 
+     * chama a função geral de "comandos.c" que mostra as informações 
+     * do arquivo selecionado
+     */
+    case 'i': /* tecla "I" */
       if (num_entradas > 0) {
         mostrar_info_arquivo(dir_atual, entries[selecionado].nome);
       }
       break;
 
-    case 'f': // cria arquivo fragmentado (pra teste)
+    /* criar arquivo fragmentado para teste */
+    case 'f': /* tecla "F" */
       if (num_entradas > 0) {
         criar_arquivo_fragmentado(dir_atual);
-        // atualiza a lista de arquivos
+        /* atualiza a lista de arquivos novamente para mostrar o arquivo
+         * fragmentado que foi criado
+         */
         DirEntry *novas_entradas = NULL;
         int novo_num = listar_diretorio(dir_atual, &novas_entradas);
         if (novo_num >= 0) {
@@ -113,18 +147,18 @@ int main() {
       }
       break;
 
-    case 'q':                           // sai do programa
-      limpar_arquivos_teste(dir_atual); // limpa arquivo de teste
+    case 'q':                           /* sai do programa */
+      limpar_arquivos_teste(dir_atual); /* limpa arquivo de teste */
       sair = 1;
       break;
     }
   }
 
-  // limpeza antes de fechar
+  /* verifica se a lista entries foi alocada e libera ela */
   if (entries != NULL) {
-    free(entries); // libera a memória da lista
+    free(entries); 
   }
-  restaurar_terminal(); // volta o terminal ao normal
+  restaurar_terminal(); 
 
   return 0;
 }
